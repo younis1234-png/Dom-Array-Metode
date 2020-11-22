@@ -1,0 +1,116 @@
+const main = document.getElementById("main");
+const addUserBtn = document.getElementById("add-user");
+const doubleBtn = document.getElementById("double");
+const showMillionaires = document.getElementById("show-millionaires");
+const sortBtn = document.getElementById("sort");
+const calculateWealthBtn = document.getElementById("calculate-wealth");
+
+// initilize emtpy array
+let data = [];
+
+getRandomUser();
+getRandomUser();
+getRandomUser();
+
+// Fetch random user and add money
+
+async function getRandomUser() {
+  // async means it happens behind the sine
+  const res = await fetch("https://randomuser.me/api"); // we put it into a variable and await if to wait for it to finish
+  const data = await res.json();
+
+  // on our object when we console.log(data) now we use results[0] form ur object list
+  console.log(data);
+  // put it in a variable
+  const user = data.results[0];
+
+  // create a object with name and money
+  const newUser = {
+    name: `${user.name.first} ${user.name.last}`,
+    money: Math.floor(Math.random() * 10000000),
+    // name and random money up to million
+    // by console.log(newUser); you will see
+    // plus with the declarition above getRandomUser();
+  };
+  //   console.log(newUser);
+
+  //now we gonna take all this and put it into a function call addData
+  addData(newUser);
+}
+// double everyone money
+function doubleMoney() {
+  data = data.map((user) => {
+    return { ...user, money: user.money * 2 };
+  });
+
+  updateDOM();
+}
+
+// sort users by richest
+function sortByRichest() {
+  data.sort((a, b) => b.money - a.money);
+  updateDOM();
+}
+
+// filter only millionaires
+function show() {
+  data = data.filter((user) => user.money > 1000000);
+  updateDOM();
+}
+
+// calculate wealth
+function calculateWealth() {
+  const wealth = data.reduce((acc, user) => (acc += user.money), 0);
+
+  const wealthEl = document.createElement("div");
+  wealthEl.innerHTML = `<h3>Total wealth: <strong>${formatMoney(
+    wealth
+  )}</strong></h3>`;
+  main.appendChild(wealth);
+}
+
+// Add new object to data array
+function addData(obj) {
+  data.push(obj);
+
+  // delecraing updateDom here
+  updateDOM();
+}
+
+// Update DOM
+// we just want the default (data array) the empty one at the top we made
+// it takes 2 parameters
+function updateDOM(providedData = data) {
+  // clair main div
+  main.innerHTML = "<h2><strong>Person</strong> Wealth</h2>";
+
+  // take the provideData and loop through it
+  providedData.forEach((item) => {
+    const element = document.createElement("div");
+    element.classList.add("person");
+    element.innerHTML = `<strong>${item.name}</strong> ${formatMoney(
+      item.money
+    )}`;
+    // to display our results
+    main.appendChild(element);
+  });
+}
+
+// Format number as money - https://stackoverflow.com/questions/149055/how-to-format-numbers-as-currency-string
+function formatMoney(number) {
+  return "$" + number.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,");
+}
+
+// Event listener and add the getRandomUser
+addUserBtn.addEventListener("click", getRandomUser);
+doubleBtn.addEventListener("click", doubleMoney);
+sortBtn.addEventListener("click", sortByRichest);
+showMillionaires.addEventListener("click", show);
+calculateWealthBtn.addEventListener("click", calculateWealth);
+
+//map() = is loop through an array, and it return array inside our array
+
+//sort() = to short it from bigger or smaller (assecending order => return a-b;) desending order => return b-a) passing 2 paramteres in a function
+
+//filter() filter things out for example the millionaires
+//reduce() it put everything together in a array list
